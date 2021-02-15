@@ -3,10 +3,19 @@
 namespace Tests\Feature;
 
 use App\Models\News;
+use Faker\Factory;
 use Tests\TestCase;
 
 class NewsTest extends TestCase
 {
+    private $faker;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->faker = Factory::create();
+    }
+
     public function test_index_news()
     {
         $response = $this->get('/api/news');
@@ -15,11 +24,10 @@ class NewsTest extends TestCase
 
     public function test_store_news()
     {
-        $faker = $faker =  \Faker\Factory::create();
         $response =  $this->post('/api/news',[
-            'title'     => $faker->slug,
-            'body'      => $faker->text,
-            'link'      => $faker->url
+            'title'     => $this->faker->slug,
+            'body'      => $this->faker->text,
+            'link'      => $this->faker->url
         ]);
 
         $response->assertStatus(201);
@@ -34,12 +42,11 @@ class NewsTest extends TestCase
 
     public function test_update_news()
     {
-        $faker = $faker =  \Faker\Factory::create();
         $news_id = News::first()->value('id');
         $response = $this->patch("/api/news/$news_id",[
-            'title'     => $faker->slug,
-            'body'      => $faker->text,
-            'link'      => $faker->url
+            'title'     => $this->faker->slug,
+            'body'      => $this->faker->text,
+            'link'      => $this->faker->url
         ]);
         $response->assertStatus(200);
     }
@@ -54,7 +61,7 @@ class NewsTest extends TestCase
 
     public function test_counter_news()
     {
-        $news = News::first();
+        $news = News::inRandomOrder()->first();
         $news->newsCounter();
         $this->assertNotEquals(0, $news->counter);
     }

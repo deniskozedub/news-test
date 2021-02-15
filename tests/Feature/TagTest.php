@@ -4,12 +4,21 @@ namespace Tests\Feature;
 
 use App\Models\News;
 use App\Models\Tag;
+use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class TagTest extends TestCase
 {
+    private $faker;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->faker = Factory::create();
+    }
+
     public function test_index_news()
     {
         $response = $this->get('/api/tags');
@@ -18,10 +27,9 @@ class TagTest extends TestCase
 
     public function test_store_tag()
     {
-        $faker = $faker =  \Faker\Factory::create();
         $response =  $this->post('/api/tags',[
-            'name'     => $faker->slug,
-            'link'      => $faker->unique()->text
+            'name'     => $this->faker->slug,
+            'link'      => $this->faker->unique()->url
         ]);
 
         $response->assertStatus(201);
@@ -36,11 +44,10 @@ class TagTest extends TestCase
 
     public function test_update_news()
     {
-        $faker = $faker =  \Faker\Factory::create();
         $tag_id = Tag::first()->value('id');
         $response = $this->patch("/api/tags/$tag_id",[
-            'name'     => $faker->slug,
-            'link'      => $faker->unique()->word
+            'name'     => $this->faker->slug,
+            'link'      => $this->faker->unique()->url
         ]);
         $response->assertStatus(200);
     }
@@ -55,13 +62,12 @@ class TagTest extends TestCase
 
     public function test_create_with_tags()
     {
-        $faker = $faker =  \Faker\Factory::create();
         $tags = Tag::first()->pluck('id')->toArray();
         $str_tags = implode(',', $tags);
         $response =  $this->post('/api/news',[
-            'title'     => $faker->slug,
-            'body'      => $faker->text,
-            'link'      => $faker->url,
+            'title'     => $this->faker->slug,
+            'body'      => $this->faker->text,
+            'link'      => $this->faker->url,
             'tags'      => $str_tags
         ]);
 
